@@ -50,6 +50,7 @@ public class StatsServiceImpl implements StatsService {
 
         return results.stream()
                 .map(r -> new StatsResponse((String) r[0], (String) r[1], ((Number) r[2]).intValue()))
+                .sorted((s1, s2) -> Integer.compare(s2.getHits(), s1.getHits()))
                 .toList();
     }
 }

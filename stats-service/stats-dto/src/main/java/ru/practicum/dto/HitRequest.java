@@ -1,28 +1,22 @@
-package ru.practicum.explorewithme.stats.model;
+package ru.practicum.dto;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "hits")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HitEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class HitRequest {
     private String app;
-
     private String uri;
-
     private String ip;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 }
