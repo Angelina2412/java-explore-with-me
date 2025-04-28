@@ -5,7 +5,7 @@ services:
     ports:
       - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm-stats
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stat
       - SPRING_DATASOURCE_USERNAME=stat
       - SPRING_DATASOURCE_PASSWORD=stats
 
