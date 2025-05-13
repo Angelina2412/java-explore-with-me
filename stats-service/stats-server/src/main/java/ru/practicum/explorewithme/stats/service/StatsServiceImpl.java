@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.HitRequest;
 import ru.practicum.dto.StatsResponse;
+import ru.practicum.explorewithme.stats.exception.BadRequestException;
 import ru.practicum.explorewithme.stats.mapper.HitMapper;
 import ru.practicum.explorewithme.stats.model.HitEntity;
 import ru.practicum.explorewithme.stats.repository.HitRepository;
@@ -30,6 +31,10 @@ public class StatsServiceImpl implements StatsService {
     public List<StatsResponse> getStats(String start, String end, List<String> uris, boolean unique) {
         LocalDateTime startDateTime = LocalDateTime.parse(start, FORMATTER);
         LocalDateTime endDateTime = LocalDateTime.parse(end, FORMATTER);
+
+        if (startDateTime.isAfter(endDateTime)) {
+            throw new IllegalArgumentException("Параметр start не может быть позже параметра end.");
+        }
 
         List<Object[]> results;
         if (uris == null || uris.isEmpty()) {

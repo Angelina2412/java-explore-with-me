@@ -1,0 +1,118 @@
+package ru.practicum.main.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import ru.practicum.main.dto.AdminEventDto;
+import ru.practicum.main.dto.EventFullDto;
+import ru.practicum.main.dto.UpdateEventAdminRequest;
+import ru.practicum.main.enums.EventState;
+import ru.practicum.main.exceptions.BadRequestException;
+import ru.practicum.main.exceptions.ConflictException;
+import ru.practicum.main.exceptions.NotFoundException;
+import ru.practicum.main.mapper.EventMapper;
+import ru.practicum.main.model.Category;
+import ru.practicum.main.model.Event;
+import ru.practicum.main.repository.CategoryRepository;
+import ru.practicum.main.repository.EventRepository;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class AdminEventServiceImpl implements AdminEventService {
+
+    private final EventRepository eventRepository;
+    private final CategoryRepository categoryRepository;
+
+    private final EventMapper eventMapper;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    @Override
+    public List<AdminEventDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
+                                            String rangeStart, String rangeEnd, int from, int size) {
+
+        LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, formatter) : null;
+        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, formatter) : null;
+
+        if (start != null && end != null && start.isAfter(end)) {
+            throw new IllegalArgumentException("rangeStart не может быть после rangeEnd");
+        }
+
+        Pageable pageable = PageRequest.of(from / size, size);
+
+        return eventRepository.searchByAdminFilters(users, states, categories, start, end, pageable)
+                .stream()
+                .map(event -> eventMapper.toAdminDto(event, 0, 0))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest request) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+
+        if (request.getAnnotation() != null) {
+            event.setAnnotation(request.getAnnotation());
+        }
+        if (request.getCategory() != null) {
+            Category category = categoryRepository.findById(request.getCategory())
+                    .orElseThrow(() -> new NotFoundException("Category with id=" + request.getCategory() + " was not found"));
+            event.setCategory(category);
+        }
+        if (request.getDescription() != null) {
+            event.setDescription(request.getDescription());
+        }
+        if (request.getEventDate() != null) {
+            LocalDateTime newEventDate = LocalDateTime.parse(request.getEventDate(), formatter);
+            if (event.getState() == EventState.PENDING) {
+                if (newEventDate.isBefore(LocalDateTime.now().plusHours(1))) {
+                    throw new IllegalArgumentException("Мероприятие должно быть хотя бы через час после публикации");
+                }
+            }
+            event.setEventDate(newEventDate);
+        }
+        if (request.getLocation() != null) {
+            event.setLocation(request.getLocation());
+        }
+        if (request.getPaid() != null) {
+            event.setPaid(request.getPaid());
+        }
+        if (request.getParticipantLimit() != null) {
+            event.setParticipantLimit(request.getParticipantLimit());
+        }
+        if (request.getRequestModeration() != null) {
+            event.setRequestModeration(request.getRequestModeration());
+        }
+        if (request.getTitle() != null) {
+            event.setTitle(request.getTitle());
+        }
+
+        if (request.getStateAction() != null) {
+            switch (request.getStateAction()) {
+                case PUBLISH_EVENT:
+                    if (event.getState() != EventState.PENDING) {
+                        throw new ConflictException("Cannot publish the event because it's not in the right state: " + event.getState());
+                    }
+                    event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
+                    break;
+                case REJECT_EVENT:
+                    if (event.getState() == EventState.PUBLISHED) {
+                        throw new ConflictException("Cannot reject the event because it is already published");
+                    }
+                    event.setState(EventState.CANCELED);
+                    break;
+            }
+        }
+
+        Event updated = eventRepository.save(event);
+        return eventMapper.toFullDto(updated);
+    }
+
+
+}
