@@ -8,6 +8,7 @@ import ru.practicum.main.dto.AdminEventDto;
 import ru.practicum.main.dto.EventFullDto;
 import ru.practicum.main.dto.UpdateEventAdminRequest;
 import ru.practicum.main.enums.EventState;
+import ru.practicum.main.enums.RequestStatus;
 import ru.practicum.main.exceptions.BadRequestException;
 import ru.practicum.main.exceptions.ConflictException;
 import ru.practicum.main.exceptions.NotFoundException;
@@ -16,6 +17,7 @@ import ru.practicum.main.model.Category;
 import ru.practicum.main.model.Event;
 import ru.practicum.main.repository.CategoryRepository;
 import ru.practicum.main.repository.EventRepository;
+import ru.practicum.main.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +32,8 @@ public class AdminEventServiceImpl implements AdminEventService {
     private final CategoryRepository categoryRepository;
 
     private final EventMapper eventMapper;
+
+    private final ParticipationRequestRepository participationRequestRepository;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
@@ -47,9 +51,15 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         return eventRepository.searchByAdminFilters(users, states, categories, start, end, pageable)
                 .stream()
-                .map(event -> eventMapper.toAdminDto(event, 0, 0))
+                .map(event -> {
+                    int confirmedRequests = participationRequestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED);
+                    long views = event.getViews() != null ? event.getViews() : 0;
+                    return eventMapper.toAdminDto(event, confirmedRequests, views);
+                })
                 .collect(Collectors.toList());
     }
+
+
 
     @Override
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest request) {

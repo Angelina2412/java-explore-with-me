@@ -91,6 +91,7 @@ public class EventServiceImpl implements EventService {
                 List.of(request.getRequestURI()),
                 true
         );
+        System.out.println("Ответ от stats-сервиса: " + stats);
 
         long views = stats.isEmpty() ? 0 : stats.get(0).getHits();
 
