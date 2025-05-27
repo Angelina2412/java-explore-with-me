@@ -7,13 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.dto.*;
 import ru.practicum.main.enums.EventState;
 import ru.practicum.main.enums.RequestStatus;
-import ru.practicum.main.exceptions.BadRequestException;
 import ru.practicum.main.exceptions.ConflictException;
 import ru.practicum.main.exceptions.ForbiddenException;
 import ru.practicum.main.exceptions.NotFoundException;
 import ru.practicum.main.mapper.EventMapper;
 import ru.practicum.main.mapper.ParticipationRequestMapper;
-import ru.practicum.main.model.*;
+import ru.practicum.main.model.Category;
+import ru.practicum.main.model.Event;
+import ru.practicum.main.model.ParticipationRequest;
+import ru.practicum.main.model.User;
 import ru.practicum.main.repository.CategoryRepository;
 import ru.practicum.main.repository.EventRepository;
 import ru.practicum.main.repository.ParticipationRequestRepository;
@@ -39,10 +41,10 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     public EventFullDto createEvent(Long userId, NewEventDto dto) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User not found"));
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
 
         Category category = categoryRepository.findById(dto.getCategory())
-                .orElseThrow(() -> new NotFoundException("Category not found"));
+                .orElseThrow(() -> new NotFoundException("Категория не найдена"));
 
         if (dto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new IllegalArgumentException("Мероприятие должно быть как минимум через два часа");
@@ -75,17 +77,17 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     public EventFullDto getUserEventById(Long userId, Long eventId) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
         return eventMapper.toFullDto(event, 0, event.getViews());
     }
 
     @Override
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         if (event.getState() == EventState.PUBLISHED) {
-            throw new ConflictException("Event cannot be updated because it is already published.");
+            throw new ConflictException("Событие не может быть обновлено, если оно уже опубликовано.");
         }
 
         if (updateRequest.getEventDate() != null &&
@@ -100,10 +102,12 @@ public class PrivateEventServiceImpl implements PrivateEventService {
         if (updateRequest.getPaid() != null) event.setPaid(updateRequest.getPaid());
         if (updateRequest.getParticipantLimit() != null) {
             if (updateRequest.getParticipantLimit() < 0) {
-                throw new IllegalArgumentException("participantLimit не может быть отрицательным");            }
+                throw new IllegalArgumentException("participantLimit не может быть отрицательным");
+            }
             event.setParticipantLimit(updateRequest.getParticipantLimit());
         }
-        if (updateRequest.getRequestModeration() != null) event.setRequestModeration(updateRequest.getRequestModeration());
+        if (updateRequest.getRequestModeration() != null)
+            event.setRequestModeration(updateRequest.getRequestModeration());
         if (updateRequest.getLocation() != null) event.setLocation(updateRequest.getLocation());
 
         if (updateRequest.getStateAction() != null) {
@@ -124,10 +128,10 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     public EventFullDto cancelEvent(Long userId, Long eventId) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+                .orElseThrow(() -> new NotFoundException("Мероприятие не найдено"));
 
         if (event.getState() == EventState.PUBLISHED) {
-            throw new ForbiddenException("Cannot cancel published event");
+            throw new ForbiddenException("Нельзя отменить опубликованное мероприятие");
         }
 
         event.setState(EventState.CANCELED);
@@ -136,7 +140,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
     public List<ParticipationRequestDto> getEventParticipants(Long userId, Long eventId) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         List<ParticipationRequest> requests = participationRequestRepository.findByEventId(eventId);
 
@@ -156,7 +160,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     @Override
     public EventRequestStatusUpdateResult changeRequestStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
-                .orElseThrow(() -> new NotFoundException("Event not found"));
+                .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         List<ParticipationRequest> requests = participationRequestRepository.findAllById(updateRequest.getRequestIds());
 
@@ -169,7 +173,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         for (ParticipationRequest request : requests) {
             if (request.getStatus() != RequestStatus.PENDING) {
-                throw new ConflictException("Only requests with PENDING status can be changed.");
+                throw new ConflictException("Изменять можно только запросы со статусом PENDING.");
             }
 
             if (RequestStatus.CONFIRMED.name().equals(updateRequest.getStatus())) {
@@ -194,7 +198,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
                 && !rejectedRequests.isEmpty();
 
         if (allRejectedDueToLimit) {
-            throw new ConflictException("Cannot confirm requests: participant limit has been reached.");
+            throw new ConflictException("Невозможно подтвердить запросы: достигнут лимит участников.");
         }
 
         EventRequestStatusUpdateResult result = new EventRequestStatusUpdateResult();
@@ -212,7 +216,5 @@ public class PrivateEventServiceImpl implements PrivateEventService {
 
         return result;
     }
-
-
 }
 

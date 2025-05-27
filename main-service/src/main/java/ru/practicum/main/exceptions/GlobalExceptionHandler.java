@@ -89,6 +89,4 @@ public class GlobalExceptionHandler {
                 "details", ex.getMostSpecificCause().getMessage()
         );
     }
-
-
 }

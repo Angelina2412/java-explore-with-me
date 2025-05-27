@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.HitRequest;
 import ru.practicum.dto.StatsResponse;
-import ru.practicum.explorewithme.stats.exception.BadRequestException;
 import ru.practicum.explorewithme.stats.mapper.HitMapper;
 import ru.practicum.explorewithme.stats.model.HitEntity;
 import ru.practicum.explorewithme.stats.repository.HitRepository;

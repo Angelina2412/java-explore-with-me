@@ -1,7 +1,6 @@
 package ru.practicum.main.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
@@ -36,7 +34,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getById(Long id) {
-        log.info("Ищем категорию с id {}", id);
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Категория с id " + id + " не найдена"));
 
@@ -57,17 +54,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public void deleteCategory(Long catId) {
-        log.info("Удаление категории {}", catId);
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new NotFoundException("Категория с  id=" + catId + " не найдена"));
-        log.info("Категория найдена: {}", category);
 
         if (eventRepository.existsByCategoryId(catId)) {
-            log.warn("Нельзя удалить: есть события в категории {}", category.getId());
             throw new ConflictException("У категории есть события");
         }
-
-        log.info("Удаляем категорию {}", category.getId());
         categoryRepository.delete(category);
     }
 

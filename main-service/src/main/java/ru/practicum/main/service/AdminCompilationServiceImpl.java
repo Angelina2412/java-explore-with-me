@@ -29,7 +29,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
     @Override
     public void deleteCompilation(Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation not found"));
+                .orElseThrow(() -> new NotFoundException("Мероприятие не найдено"));
 
         compilationRepository.delete(compilation);
     }
@@ -37,7 +37,7 @@ public class AdminCompilationServiceImpl implements AdminCompilationService {
     @Override
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest updateCompilationRequest) {
         Compilation compilation = compilationRepository.findById(compId)
-                .orElseThrow(() -> new NotFoundException("Compilation not found"));
+                .orElseThrow(() -> new NotFoundException("Мероприятие не найдено"));
 
         compilationMapper.updateEntityFromDto(updateCompilationRequest, compilation);
 

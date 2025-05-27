@@ -7,7 +7,6 @@ import ru.practicum.main.dto.AdminEventDto;
 import ru.practicum.main.dto.EventFullDto;
 import ru.practicum.main.dto.UpdateEventAdminRequest;
 import ru.practicum.main.service.AdminEventService;
-import ru.practicum.main.service.CategoryService;
 
 import java.util.List;
 

@@ -1,10 +1,6 @@
 package ru.practicum;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,18 +11,16 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-//@Component
 public class StatsClient {
 
     private final String statsServerUrl;
     private final RestTemplate restTemplate;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public StatsClient(String statsServerUrl, RestTemplate restTemplate) {
         this.statsServerUrl = statsServerUrl;
         this.restTemplate = restTemplate;
     }
-
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public void sendHit(HitRequest hitRequest) {
         String url = statsServerUrl + "/hit";
@@ -47,9 +41,8 @@ public class StatsClient {
             return response.getBody() != null ? List.of(response.getBody()) : List.of();
         } catch (RestClientException e) {
             System.err.println("Ошибка при вызове stats-server: " + e.getMessage());
-            return List.of(); // безопасное поведение
+            return List.of();
         }
     }
-
 }
 

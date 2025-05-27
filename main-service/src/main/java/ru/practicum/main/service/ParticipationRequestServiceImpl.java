@@ -39,26 +39,26 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     @Override
     public ParticipationRequestDto addParticipationRequest(Long userId, Long eventId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("User with id=" + userId + " was not found"));
+                .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
 
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new NotFoundException("События с id=" + eventId + " не найдено"));
 
         if (requestRepository.existsByRequesterIdAndEventId(userId, eventId)) {
-            throw new ConflictException("Request already exists");
+            throw new ConflictException("Запрос уже существует");
         }
 
         if (event.getInitiator().getId().equals(userId)) {
-            throw new ConflictException("Initiator can't request to own event");
+            throw new ConflictException("Инициатор не может запросить собственное событие");
         }
 
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new ConflictException("Cannot request participation in unpublished event");
+            throw new ConflictException("Невозможно запросить участие в неопубликованном мероприятии\n");
         }
 
         if (event.getParticipantLimit() != 0 &&
                 requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED) >= event.getParticipantLimit()) {
-            throw new ConflictException("Participant limit reached");
+            throw new ConflictException("Лимит участников достигнут");
         }
 
         ParticipationRequest request = ParticipationRequest.builder()
@@ -76,7 +76,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     @Override
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         ParticipationRequest request = requestRepository.findByIdAndRequesterId(requestId, userId)
-                .orElseThrow(() -> new NotFoundException("Request with id=" + requestId + " was not found"));
+                .orElseThrow(() -> new NotFoundException("Запрос с id=" + requestId + " не найден"));
 
         request.setStatus(RequestStatus.CANCELED);
         return requestMapper.toDto(requestRepository.save(request));
@@ -84,7 +84,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     private void checkUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NotFoundException("User with id=" + userId + " was not found");
+            throw new NotFoundException("Пользователь с " + userId + " не найден");
         }
     }
 }

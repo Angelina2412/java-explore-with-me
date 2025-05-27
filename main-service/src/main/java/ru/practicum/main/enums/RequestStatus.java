@@ -5,5 +5,4 @@ public enum RequestStatus {
     CONFIRMED,
     REJECTED,
     CANCELED,
-    CANCEL_REVIEW
 }

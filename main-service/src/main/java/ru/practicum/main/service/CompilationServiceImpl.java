@@ -1,11 +1,11 @@
 package ru.practicum.main.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.main.dto.CompilationDto;
+import ru.practicum.main.exceptions.NotFoundException;
 import ru.practicum.main.mapper.CompilationMapper;
 import ru.practicum.main.model.Compilation;
 import ru.practicum.main.repository.CompilationRepository;
@@ -35,9 +35,9 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public CompilationDto getById(Long id) throws ChangeSetPersister.NotFoundException {
+    public CompilationDto getById(Long id) {
         Compilation compilation = compilationRepository.findById(id)
-                .orElseThrow(() -> new ChangeSetPersister.NotFoundException());
+                .orElseThrow(() -> new NotFoundException("Подборка не найдена"));
         return compilationMapper.toDto(compilation);
     }
 }

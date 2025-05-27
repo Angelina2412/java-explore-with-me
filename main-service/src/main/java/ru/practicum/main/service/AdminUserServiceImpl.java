@@ -74,11 +74,9 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public void deleteUser(Long userId) {
-        // Проверяем, существует ли пользователь с данным id
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // Удаляем пользователя
         userRepository.delete(user);
     }
 }

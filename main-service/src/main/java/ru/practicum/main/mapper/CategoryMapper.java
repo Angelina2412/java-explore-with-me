@@ -14,6 +14,7 @@ public class CategoryMapper {
                 category.getDescription()
         );
     }
+
     public Category toEntity(NewCategoryDto newCategoryDto) {
         return new Category(
                 null,

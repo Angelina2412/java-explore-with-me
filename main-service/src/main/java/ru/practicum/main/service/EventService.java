@@ -2,10 +2,8 @@ package ru.practicum.main.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import ru.practicum.main.dto.EventDetailsDto;
-import ru.practicum.main.dto.EventFullDto;
 import ru.practicum.main.dto.EventShortDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {

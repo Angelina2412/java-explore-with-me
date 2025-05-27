@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class NewEventDto {
-    @Size(min = 3,max = 120, message = "Заголовок не может быть меньше 3 символов и больше 120")
+    @Size(min = 3, max = 120, message = "Заголовок не может быть меньше 3 символов и больше 120")
     private String title;
 
     @NotBlank(message = "Аннотация не может быть пустая или состоять только из пробелов.")

@@ -6,7 +6,9 @@ import ru.practicum.main.dto.UpdateCompilationRequest;
 
 public interface AdminCompilationService {
     CompilationDto saveCompilation(NewCompilationDto newCompilationDto);
+
     void deleteCompilation(Long compId);
+
     CompilationDto updateCompilation(Long compId, UpdateCompilationRequest updateCompilationRequest);
 }
 

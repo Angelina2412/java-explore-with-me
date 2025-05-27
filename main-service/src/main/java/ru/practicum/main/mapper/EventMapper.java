@@ -13,7 +13,6 @@ import ru.practicum.main.model.User;
 import java.time.LocalDateTime;
 
 @Component
-@Slf4j
 public class EventMapper {
 
     public EventShortDto toShortDto(Event event, long confirmedRequests, long views) {

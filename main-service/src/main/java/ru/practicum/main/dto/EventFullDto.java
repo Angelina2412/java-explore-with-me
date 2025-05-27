@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class EventFullDto {
     private Long id;
 
-    @Size(min = 3,max = 120, message = "Заголовок не может быть меньше 3 символов и больше 120")
+    @Size(min = 3, max = 120, message = "Заголовок не может быть меньше 3 символов и больше 120")
     private String title;
 
     @Size(min = 20, max = 2000, message = "Аннотация не может быть меньше 20 символов и больше 2000")

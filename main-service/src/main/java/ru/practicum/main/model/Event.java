@@ -36,9 +36,7 @@ public class Event {
 
     @Column(nullable = false)
     private Boolean paid;
-
     private Integer participantLimit;
-
     private Long views = 0L;
 
     @ManyToOne

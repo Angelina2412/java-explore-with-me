@@ -9,7 +9,6 @@ import ru.practicum.main.dto.EventFullDto;
 import ru.practicum.main.dto.UpdateEventAdminRequest;
 import ru.practicum.main.enums.EventState;
 import ru.practicum.main.enums.RequestStatus;
-import ru.practicum.main.exceptions.BadRequestException;
 import ru.practicum.main.exceptions.ConflictException;
 import ru.practicum.main.exceptions.NotFoundException;
 import ru.practicum.main.mapper.EventMapper;
@@ -28,13 +27,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminEventServiceImpl implements AdminEventService {
 
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final EventRepository eventRepository;
     private final CategoryRepository categoryRepository;
-
     private final EventMapper eventMapper;
-
     private final ParticipationRequestRepository participationRequestRepository;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public List<AdminEventDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
@@ -44,7 +41,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, formatter) : null;
 
         if (start != null && end != null && start.isAfter(end)) {
-            throw new IllegalArgumentException("rangeStart не может быть после rangeEnd");
+            throw new IllegalArgumentException("начало не может быть после конца");
         }
 
         Pageable pageable = PageRequest.of(from / size, size);
@@ -60,18 +57,17 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
 
-
     @Override
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest request) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id=" + eventId + " was not found"));
+                .orElseThrow(() -> new NotFoundException("Мероприятие с  id=" + eventId + " не найдено"));
 
         if (request.getAnnotation() != null) {
             event.setAnnotation(request.getAnnotation());
         }
         if (request.getCategory() != null) {
             Category category = categoryRepository.findById(request.getCategory())
-                    .orElseThrow(() -> new NotFoundException("Category with id=" + request.getCategory() + " was not found"));
+                    .orElseThrow(() -> new NotFoundException("Категория с id=" + request.getCategory() + " не найдена"));
             event.setCategory(category);
         }
         if (request.getDescription() != null) {
@@ -106,14 +102,14 @@ public class AdminEventServiceImpl implements AdminEventService {
             switch (request.getStateAction()) {
                 case PUBLISH_EVENT:
                     if (event.getState() != EventState.PENDING) {
-                        throw new ConflictException("Cannot publish the event because it's not in the right state: " + event.getState());
+                        throw new ConflictException("Невозможно опубликовать мероприятие, потому что неправильный статус: " + event.getState());
                     }
                     event.setState(EventState.PUBLISHED);
                     event.setPublishedOn(LocalDateTime.now());
                     break;
                 case REJECT_EVENT:
                     if (event.getState() == EventState.PUBLISHED) {
-                        throw new ConflictException("Cannot reject the event because it is already published");
+                        throw new ConflictException("Нельзя отклонить мероприятие, потому что уже опубликовано");
                     }
                     event.setState(EventState.CANCELED);
                     break;
@@ -123,6 +119,4 @@ public class AdminEventServiceImpl implements AdminEventService {
         Event updated = eventRepository.save(event);
         return eventMapper.toFullDto(updated);
     }
-
-
 }
