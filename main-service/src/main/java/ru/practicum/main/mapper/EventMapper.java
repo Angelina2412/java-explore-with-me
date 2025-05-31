@@ -1,6 +1,5 @@
 package ru.practicum.main.mapper;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 import ru.practicum.main.dto.*;
