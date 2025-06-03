@@ -46,8 +46,13 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now()
         ));
 
-        LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, FORMATTER) : null;
-        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, FORMATTER) : null;
+        LocalDateTime start = (rangeStart != null && !rangeStart.isBlank())
+                ? LocalDateTime.parse(rangeStart, FORMATTER)
+                : null;
+
+        LocalDateTime end = (rangeEnd != null && !rangeEnd.isBlank())
+                ? LocalDateTime.parse(rangeEnd, FORMATTER)
+                : null;
 
         if (start != null && end != null && start.isAfter(end)) {
             throw new IllegalArgumentException("rangeStart не может быть после rangeEnd");
