@@ -46,6 +46,14 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now()
         ));
 
+        if (categories != null && categories.isEmpty()) {
+            categories = null;
+        }
+
+        if (text != null && text.isBlank()) {
+            text = null;
+        }
+
         LocalDateTime start = (rangeStart != null && !rangeStart.isBlank())
                 ? LocalDateTime.parse(rangeStart, FORMATTER)
                 : null;
@@ -65,7 +73,8 @@ public class EventServiceImpl implements EventService {
         );
 
         return events.stream()
-                .filter(e -> !onlyAvailable || e.getParticipantLimit() > requestRepository.countByEventIdAndStatus(e.getId(), RequestStatus.CONFIRMED))
+                .filter(e -> !onlyAvailable ||
+                        e.getParticipantLimit() > requestRepository.countByEventIdAndStatus(e.getId(), RequestStatus.CONFIRMED))
                 .map(e -> {
                     long confirmedRequests = requestRepository.countByEventIdAndStatus(e.getId(), RequestStatus.CONFIRMED);
                     long views = e.getViews();

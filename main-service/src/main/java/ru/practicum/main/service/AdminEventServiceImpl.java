@@ -36,9 +36,22 @@ public class AdminEventServiceImpl implements AdminEventService {
     @Override
     public List<AdminEventDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
                                             String rangeStart, String rangeEnd, int from, int size) {
+        if (users != null && users.isEmpty()) {
+            users = null;
+        }
+        if (states != null && states.isEmpty()) {
+            states = null;
+        }
+        if (categories != null && categories.isEmpty()) {
+            categories = null;
+        }
 
-        LocalDateTime start = (rangeStart != null) ? LocalDateTime.parse(rangeStart, formatter) : null;
-        LocalDateTime end = (rangeEnd != null) ? LocalDateTime.parse(rangeEnd, formatter) : null;
+        LocalDateTime start = (rangeStart != null && !rangeStart.isBlank())
+                ? LocalDateTime.parse(rangeStart, formatter)
+                : null;
+        LocalDateTime end = (rangeEnd != null && !rangeEnd.isBlank())
+                ? LocalDateTime.parse(rangeEnd, formatter)
+                : null;
 
         if (start != null && end != null && start.isAfter(end)) {
             throw new IllegalArgumentException("начало не может быть после конца");
@@ -55,7 +68,6 @@ public class AdminEventServiceImpl implements AdminEventService {
                 })
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest request) {
