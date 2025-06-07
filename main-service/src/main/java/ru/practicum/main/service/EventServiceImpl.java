@@ -20,6 +20,7 @@ import ru.practicum.main.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,9 +63,19 @@ public class EventServiceImpl implements EventService {
             throw new IllegalArgumentException("rangeStart не может быть после rangeEnd");
         }
 
+        if (start == null) {
+            start = LocalDateTime.of(1970, 1, 1, 0, 0);
+        }
+        if (end == null) {
+            end = LocalDateTime.of(2099, 12, 31, 23, 59);
+        }
+        if (categories == null) {
+            categories = Collections.emptyList();
+        }
+        int categoriesSize = categories.size();
+
         Pageable pageable = PageRequest.of(from / size, size);
 
-        int categoriesSize = (categories == null) ? 0 : categories.size();
         List<Event> events = eventRepository.findPublishedEventsWithFilters(
                 text,
                 (categoriesSize == 0) ? List.of(-1L) : categories,
