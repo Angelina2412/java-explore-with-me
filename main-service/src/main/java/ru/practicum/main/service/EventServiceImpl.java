@@ -50,10 +50,6 @@ public class EventServiceImpl implements EventService {
             text = null;
         }
 
-        if (categories == null || categories.isEmpty()) {
-            categories = null;
-        }
-
         LocalDateTime start = (rangeStart != null && !rangeStart.isBlank())
                 ? LocalDateTime.parse(rangeStart, FORMATTER)
                 : null;
