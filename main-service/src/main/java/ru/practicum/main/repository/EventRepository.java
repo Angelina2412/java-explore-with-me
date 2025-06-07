@@ -27,8 +27,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (:text IS NULL OR (LOWER(e.annotation) LIKE LOWER(CONCAT('%', :text, '%')) " +
             "                        OR LOWER(e.description) LIKE LOWER(CONCAT('%', :text, '%')))) " +
             "AND (:paid IS NULL OR e.paid = :paid) " +
-            "AND (:rangeStart IS NULL OR e.eventDate >= CAST(:rangeStart AS timestamp)) " +
-            "AND (:rangeEnd IS NULL OR e.eventDate <= CAST(:rangeEnd AS timestamp)) " +
+            "AND (e.eventDate >= COALESCE(:rangeStart, e.eventDate)) " +
+            "AND (e.eventDate <= COALESCE(:rangeEnd, e.eventDate)) " +
             "AND (:categoriesSize = 0 OR e.category.id IN :categories)")
     List<Event> findPublishedEventsWithFilters(@Param("text") String text,
                                                @Param("categories") List<Long> categories,
