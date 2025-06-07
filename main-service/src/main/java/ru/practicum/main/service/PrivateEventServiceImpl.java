@@ -139,7 +139,7 @@ public class PrivateEventServiceImpl implements PrivateEventService {
     }
 
     public List<ParticipationRequestDto> getEventParticipants(Long userId, Long eventId) {
-        Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
+        eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Событие не найдено"));
 
         List<ParticipationRequest> requests = participationRequestRepository.findByEventId(eventId);

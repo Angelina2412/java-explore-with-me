@@ -35,6 +35,6 @@ public class ParticipationRequest {
     @Column(nullable = false)
     private RequestStatus status;
 
-    @Column(name = "created", nullable = false)
+    @Column(name = "created", nullable = false, updatable = false)
     private LocalDateTime created;
 }
