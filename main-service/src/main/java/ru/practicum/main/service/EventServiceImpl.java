@@ -46,12 +46,13 @@ public class EventServiceImpl implements EventService {
                 LocalDateTime.now()
         ));
 
-        if (categories != null && categories.isEmpty()) {
-            categories = null;
-        }
-
         if (text != null && text.isBlank()) {
             text = null;
+        }
+
+        boolean categoryZero = (categories == null || categories.isEmpty());
+        if (categoryZero) {
+            categories = List.of(-1L);
         }
 
         LocalDateTime start = (rangeStart != null && !rangeStart.isBlank())
@@ -69,7 +70,7 @@ public class EventServiceImpl implements EventService {
         Pageable pageable = PageRequest.of(from / size, size);
 
         List<Event> events = eventRepository.findPublishedEventsWithFilters(
-                text, categories, paid, start, end, pageable
+                text, categories, paid, categoryZero, start, end, pageable
         );
 
         return events.stream()
