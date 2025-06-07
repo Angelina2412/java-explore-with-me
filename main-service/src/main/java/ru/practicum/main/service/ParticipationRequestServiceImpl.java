@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
@@ -61,10 +62,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ConflictException("Лимит участников достигнут");
         }
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime truncated = now.withNano(0);
+
         ParticipationRequest request = ParticipationRequest.builder()
                 .event(event)
                 .requester(user)
-                .created(LocalDateTime.now())
+                .created(truncated)
                 .status((!event.isRequestModeration() || event.getParticipantLimit() == 0)
                         ? RequestStatus.CONFIRMED
                         : RequestStatus.PENDING)
