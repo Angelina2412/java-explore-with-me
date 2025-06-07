@@ -29,14 +29,13 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "AND (:paid IS NULL OR e.paid = :paid) " +
             "AND (:rangeStart IS NULL OR e.eventDate >= :rangeStart) " +
             "AND (:rangeEnd IS NULL OR e.eventDate <= :rangeEnd) " +
-            "AND (:categoryZero = true OR e.category.id IN :categories)")
+            "AND (:categories IS NULL OR e.category.id IN :categories)")
     List<Event> findPublishedEventsWithFilters(@Param("text") String text,
-                                                   @Param("categories") List<Long> categories,
-                                                   @Param("categoryZero") boolean categoryZero,
-                                                   @Param("paid") Boolean paid,
-                                                   @Param("rangeStart") LocalDateTime rangeStart,
-                                                   @Param("rangeEnd") LocalDateTime rangeEnd,
-                                                   Pageable pageable);
+                                               @Param("categories") List<Long> categories,
+                                               @Param("paid") Boolean paid,
+                                               @Param("rangeStart") LocalDateTime rangeStart,
+                                               @Param("rangeEnd") LocalDateTime rangeEnd,
+                                               Pageable pageable);
 
     @Query("SELECT e FROM Event e " +
             "WHERE (:users IS NULL OR e.initiator.id IN :users) " +
