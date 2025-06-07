@@ -59,7 +59,21 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         Pageable pageable = PageRequest.of(from / size, size);
 
-        return eventRepository.searchByAdminFilters(users, states, categories, start, end, pageable)
+        if (users == null) users = List.of();
+        if (states == null) states = List.of();
+        if (categories == null) categories = List.of();
+
+        return eventRepository.searchByAdminFilters(
+                        users,
+                        users.size(),
+                        states,
+                        states.size(),
+                        categories,
+                        categories.size(),
+                        start,
+                        end,
+                        pageable
+                )
                 .stream()
                 .map(event -> {
                     int confirmedRequests = participationRequestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED);
