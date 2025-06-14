@@ -1,5 +1,12 @@
 package ru.practicum.main.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -20,7 +27,7 @@ import ru.practicum.main.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +40,9 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
     private final ParticipationRequestRepository requestRepository;
     private final StatsClient statsClient;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public List<EventShortDto> searchEvents(String text, List<Long> categories, Boolean paid,
@@ -63,28 +73,9 @@ public class EventServiceImpl implements EventService {
             throw new IllegalArgumentException("rangeStart не может быть после rangeEnd");
         }
 
-        if (start == null) {
-            start = LocalDateTime.of(1970, 1, 1, 0, 0);
-        }
-        if (end == null) {
-            end = LocalDateTime.of(2099, 12, 31, 23, 59);
-        }
-        if (categories == null) {
-            categories = Collections.emptyList();
-        }
-        int categoriesSize = categories.size();
-
         Pageable pageable = PageRequest.of(from / size, size);
 
-        List<Event> events = eventRepository.findPublishedEventsWithFilters(
-                text,
-                (categoriesSize == 0) ? List.of(-1L) : categories,
-                categoriesSize,
-                paid,
-                start,
-                end,
-                pageable
-        );
+        List<Event> events = findPublishedEventsWithCriteria(text, categories, paid, start, end, pageable);
 
         return events.stream()
                 .filter(e -> !onlyAvailable ||
@@ -95,6 +86,52 @@ public class EventServiceImpl implements EventService {
                     return eventMapper.toShortDto(e, confirmedRequests, views);
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<Event> findPublishedEventsWithCriteria(String text,
+                                                       List<Long> categories,
+                                                       Boolean paid,
+                                                       LocalDateTime rangeStart,
+                                                       LocalDateTime rangeEnd,
+                                                       Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Event> cq = cb.createQuery(Event.class);
+        Root<Event> event = cq.from(Event.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        predicates.add(cb.equal(event.get("state"), EventState.PUBLISHED));
+
+        if (text != null && !text.isBlank()) {
+            String pattern = "%" + text.toLowerCase() + "%";
+            Predicate annotationLike = cb.like(cb.lower(event.get("annotation")), pattern);
+            Predicate descriptionLike = cb.like(cb.lower(event.get("description")), pattern);
+            predicates.add(cb.or(annotationLike, descriptionLike));
+        }
+
+        if (categories != null && !categories.isEmpty()) {
+            predicates.add(event.get("category").get("id").in(categories));
+        }
+
+        if (paid != null) {
+            predicates.add(cb.equal(event.get("paid"), paid));
+        }
+
+        if (rangeStart != null) {
+            predicates.add(cb.greaterThanOrEqualTo(event.get("eventDate"), rangeStart));
+        }
+        if (rangeEnd != null) {
+            predicates.add(cb.lessThanOrEqualTo(event.get("eventDate"), rangeEnd));
+        }
+
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        TypedQuery<Event> query = entityManager.createQuery(cq);
+
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        return query.getResultList();
     }
 
     @Override
