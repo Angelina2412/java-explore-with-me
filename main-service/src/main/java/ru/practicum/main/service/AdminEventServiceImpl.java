@@ -1,5 +1,12 @@
 package ru.practicum.main.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +27,7 @@ import ru.practicum.main.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +40,9 @@ public class AdminEventServiceImpl implements AdminEventService {
     private final CategoryRepository categoryRepository;
     private final EventMapper eventMapper;
     private final ParticipationRequestRepository participationRequestRepository;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public List<AdminEventDto> searchEvents(List<Long> users, List<String> states, List<Long> categories,
@@ -63,18 +74,9 @@ public class AdminEventServiceImpl implements AdminEventService {
         if (states == null) states = List.of();
         if (categories == null) categories = List.of();
 
-        return eventRepository.searchByAdminFilters(
-                        users,
-                        users.size(),
-                        states,
-                        states.size(),
-                        categories,
-                        categories.size(),
-                        start,
-                        end,
-                        pageable
-                )
-                .stream()
+        List<Event> events = findEventsByAdminFilters(users, states, categories, start, end, pageable);
+
+        return events.stream()
                 .map(event -> {
                     int confirmedRequests = participationRequestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED);
                     long views = event.getViews() != null ? event.getViews() : 0;
@@ -144,5 +146,49 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         Event updated = eventRepository.save(event);
         return eventMapper.toFullDto(updated);
+    }
+
+    public List<Event> findEventsByAdminFilters(List<Long> users,
+                                                List<String> states,
+                                                List<Long> categories,
+                                                LocalDateTime rangeStart,
+                                                LocalDateTime rangeEnd,
+                                                Pageable pageable) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Event> cq = cb.createQuery(Event.class);
+        Root<Event> event = cq.from(Event.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (users != null && !users.isEmpty()) {
+            predicates.add(event.get("initiator").get("id").in(users));
+        }
+
+        if (states != null && !states.isEmpty()) {
+            predicates.add(event.get("state").in(
+                    states.stream().map(EventState::valueOf).toList()
+            ));
+        }
+
+        if (categories != null && !categories.isEmpty()) {
+            predicates.add(event.get("category").get("id").in(categories));
+        }
+
+        if (rangeStart != null) {
+            predicates.add(cb.greaterThanOrEqualTo(event.get("eventDate"), rangeStart));
+        }
+
+        if (rangeEnd != null) {
+            predicates.add(cb.lessThanOrEqualTo(event.get("eventDate"), rangeEnd));
+        }
+
+        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+
+        TypedQuery<Event> query = entityManager.createQuery(cq);
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+
+        return query.getResultList();
     }
 }
