@@ -8,6 +8,8 @@ import ru.practicum.explorewithme.stats.mapper.HitMapper;
 import ru.practicum.explorewithme.stats.model.HitEntity;
 import ru.practicum.explorewithme.stats.repository.HitRepository;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,8 +30,15 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<StatsResponse> getStats(String start, String end, List<String> uris, boolean unique) {
-        LocalDateTime startDateTime = LocalDateTime.parse(start, FORMATTER);
-        LocalDateTime endDateTime = LocalDateTime.parse(end, FORMATTER);
+        String decodedStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
+        String decodedEnd = URLDecoder.decode(end, StandardCharsets.UTF_8);
+
+        LocalDateTime startDateTime = LocalDateTime.parse(decodedStart, FORMATTER);
+        LocalDateTime endDateTime = LocalDateTime.parse(decodedEnd, FORMATTER);
+
+        if (startDateTime.isAfter(endDateTime)) {
+            throw new IllegalArgumentException("Параметр start не может быть позже параметра end.");
+        }
 
         List<Object[]> results;
         if (uris == null || uris.isEmpty()) {
