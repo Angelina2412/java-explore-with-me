@@ -1,0 +1,402 @@
+{
+	"info": {
+		"_postman_id": "dad6fb80-86e3-411b-9639-6bdc21ed5f21",
+		"name": "feature",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16899889",
+		"_collection_link": "https://blue-comet-736753.postman.co/workspace/Alfa-Work~c6fb5a07-8d2c-4059-9230-3fa5c43640a9/collection/16899889-dad6fb80-86e3-411b-9639-6bdc21ed5f21?action=share&source=collection_link&creator=16899889"
+	},
+	"item": [
+		{
+			"name": "Добавление комментария от несуществующего пользователя",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Отличное событие, очень понравилось!\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/events/1/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"events",
+						"1",
+						"comments"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:8080/users/1/events/1/comments \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Отличное событие, очень понравилось!\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Добавление комментария к несуществующему событию",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Отличное событие, очень понравилось!\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/events/1/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"events",
+						"1",
+						"comments"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:8080/users/1/events/1/comments \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Отличное событие, очень понравилось!\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Добавление комментария с несоответствующим статусом",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Отличное событие, очень понравилось!\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/events/1/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"events",
+						"1",
+						"comments"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:8080/users/1/events/1/comments \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Отличное событие, очень понравилось!\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Добавление комментария с пустым комментарием",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Отличное событие, очень понравилось!\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/events/1/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"events",
+						"1",
+						"comments"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:8080/users/1/events/1/comments \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Отличное событие, очень понравилось!\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Добавление комментария",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Отличное событие, очень понравилось!\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/events/1/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"events",
+						"1",
+						"comments"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:8080/users/1/events/1/comments \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"text\": \"Отличное событие, очень понравилось!\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Получить все комментарии о событие",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/events/1/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events",
+						"1",
+						"comments"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:8080/events/1/comments\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Получить комментарии о несуществующем событие",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/events/1/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events",
+						"1",
+						"comments"
+					]
+				},
+				"description": "Generated from cURL: curl -X GET \"http://localhost:8080/events/1/comments\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Редактирование комментария",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Обновлённый комментарий про событие\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/comments/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"comments",
+						"10"
+					]
+				},
+				"description": "Generated from cURL: curl -X PATCH \"http://localhost:8080/users/1/comments/10\" \\\n     -H \"Content-Type: application/json\" \\\n     -d '{\"text\": \"Обновлённый комментарий про событие\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Редактирование комментария от чужого пользователя",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Обновлённый комментарий про событие\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/comments/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"comments",
+						"10"
+					]
+				},
+				"description": "Generated from cURL: curl -X PATCH \"http://localhost:8080/users/1/comments/10\" \\\n     -H \"Content-Type: application/json\" \\\n     -d '{\"text\": \"Обновлённый комментарий про событие\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Редактирование комментария с пустым комментарием",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"text\": \"Обновлённый комментарий про событие\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1/comments/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"comments",
+						"10"
+					]
+				},
+				"description": "Generated from cURL: curl -X PATCH \"http://localhost:8080/users/1/comments/10\" \\\n     -H \"Content-Type: application/json\" \\\n     -d '{\"text\": \"Обновлённый комментарий про событие\"}'\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление комментария",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/1/comments/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"comments",
+						"10"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE \"http://localhost:8080/users/1/comments/10\"\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление комментария от чужого пользователя",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/users/1/comments/10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1",
+						"comments",
+						"10"
+					]
+				},
+				"description": "Generated from cURL: curl -X DELETE \"http://localhost:8080/users/1/comments/10\"\n"
+			},
+			"response": []
+		}
+	]
+}
